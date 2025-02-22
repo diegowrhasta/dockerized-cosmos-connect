@@ -1,0 +1,50 @@
+﻿networks:
+  default:
+    external: false
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"
+
+services:
+  cosmosdb:
+    restart: always
+    container_name: "azure-cosmosdb-emulator"
+    hostname: "azurecosmosemulator"
+    image: 'mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest'
+    mem_limit: 4GB
+    tty: true
+    ports:
+      - '8081:8081' # Data Explorer
+      - '8900:8900'
+      - '8901:8901'
+      - '8902:8902'
+      - '10250:10250'
+      - '10251:10251'
+      - '10252:10252'
+      - '10253:10253'
+      - '10254:10254'
+      - '10255:10255'
+      - '10256:10256'
+      - '10350:10350'
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=false
+      - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=172.16.238.246
+    networks:
+      default:
+        ipv4_address: 172.16.238.246
+  webapi:
+    image: webapi
+    build:
+      context: .
+      dockerfile: WebApi/Dockerfile
+    depends_on:
+      - cosmosdb
+    ports:
+      - '5050:8080'
+    environment:
+      - Cosmos__AccountEndpoint=https://azurecosmosemulator:8081/
+    networks:
+      default:
+        ipv4_address: 172.16.238.242

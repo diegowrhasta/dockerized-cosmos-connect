@@ -4,3 +4,8 @@ GET {{WebApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+POST {{WebApi_HostAddress}}/cosmos/
+Accept: application/json
+
+###
